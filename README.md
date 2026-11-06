@@ -1302,8 +1302,7 @@ sudo lsof -i :8000
 
 ### 트러블슈팅 2건 이상
 
-사례 1. Docker 이미지 빌드 실패
-실제 로그에 있었던 오류
+# 사례 1. Docker 이미지 빌드 실패
 
 ① 문제 상황
 
@@ -1340,14 +1339,13 @@ nginx:latest         5ab5b0b01097        243MB         66.8MB    U
 ubuntu:latest        6a06111c3b0a        163MB         45.9MB    U  
 
 
-사례 2.  Docker 컨테이너 실행 명령어와 결과 기록 불일치
+# 사례 2.  Docker 컨테이너 실행 명령어와 결과 기록 불일치
 
 ① 문제 상황
 Docker 컨테이너 실행 명령어와 실행 결과를 README에 기록하는 과정에서 명령어가 실제 실행한 내용과 다르게 작성된 것을 확인했다.
 
 ② 오류 메시지
 
-```bash
 docker run -d --name my-web -p 8080:80 my-.0
 ```
 
@@ -1359,7 +1357,6 @@ Docker 이미지 이름과 태그를 기록하는 과정에서 오타가 발생�
 ④ 해결 방법
 실제로 실행한 명령어를 확인하고 README의 명령어를 다음과 같이 수정했다.
 
-```bash
 docker run -d --name my-web -p 8080:80 my-web:1.0
 ```
 
