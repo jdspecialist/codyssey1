@@ -124,7 +124,6 @@ icacls practice-dir
 ### Docker 설치 및 점검
 - [o] Docker 버전 확인 — `docker --version`
 - [o] Docker 데몬 동작 확인 — `docker info`
-- [o] OrbStack 기반 Docker 환경 사용 확인
 - 증거: [Docker 설치·점검 로그]
 
 # Docker 설치·점검 로그
@@ -258,16 +257,6 @@ Server:
   ::1/128
  Live Restore Enabled: false
  Firewall Backend: iptables
-```
-
-## OrbStack 사용 확인
-
-```cmd
-docker context show
-```
-
-```text
-desktop-linux
 ```
 
 ### Docker 기본 운영
@@ -616,7 +605,7 @@ ubuntu:latest        6a06111c3b0a        163MB         45.9MB    U
 ## 컨테이너 실행
 
 ```cmd
-docker run -d --name my-web -p 8080:80 my-.0
+docker run -d --name my-web -p 8080:80 my-web:1.0
 ```
 
 ```text
@@ -677,7 +666,7 @@ my-web-project\20261105_140653.png
 ## 컨테이너 실행 및 포트 매핑
 
 ```cmd
-docker run -d --name my-web -p 8080:80 my-.0
+docker run -d --name my-web -p 8080:80 my-web:1.0
 ```
 
 ```text
@@ -972,10 +961,350 @@ To [https://github.com/jdspecialist/codyssey1.git](https://github.com/jdspeciali
  * [new branch]      main -> main
 ```
 
+# 네트워크 네임 스페이스
+
+## CMD에서 WSL 실행하기
+
+C:\codyssey1>wsl
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 6.18.54.1-microsoft-standard-WSL2 x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+This message is shown once a day. To disable it please create the
+/home/jd/.hushlogin file.
+
+## apt 업데이트
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ sudo apt update
+[sudo] password for jd: 
+Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+Get:3 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+Get:4 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+Get:5 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3963 kB]
+Get:6 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3675 kB]
+Get:7 http://archive.ubuntu.com/ubuntu jammy-updates/main Translation-en [582 kB]
+Get:8 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 c-n-f Metadata [20.1 kB]        
+Get:9 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [6815 kB]        
+Get:10 http://archive.ubuntu.com/ubuntu jammy-updates/restricted Translation-en [1310 kB]
+Get:11 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 c-n-f Metadata [584 B]
+Get:12 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1291 kB]
+Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/universe Translation-en [327 kB]            
+Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 c-n-f Metadata [30.8 kB]    
+Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [86.1 kB]
+Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse Translation-en [16.5 kB]
+Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 c-n-f Metadata [756 B]     
+Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [70.2 kB]
+Get:19 http://archive.ubuntu.com/ubuntu jammy-backports/main Translation-en [11.4 kB]
+Get:20 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 c-n-f Metadata [412 B]
+Get:21 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [30.8 kB]
+Get:22 http://security.ubuntu.com/ubuntu jammy-security/main Translation-en [513 kB]
+Get:23 http://archive.ubuntu.com/ubuntu jammy-backports/universe Translation-en [16.9 kB]
+Get:24 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 c-n-f Metadata [676 B]
+Get:25 http://security.ubuntu.com/ubuntu jammy-security/main amd64 c-n-f Metadata [14.7 kB]
+Get:26 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [6545 kB]
+Get:27 http://security.ubuntu.com/ubuntu jammy-security/restricted Translation-en [1257 kB]
+Get:28 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 c-n-f Metadata [600 B]
+Get:29 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1057 kB]
+Get:30 http://security.ubuntu.com/ubuntu jammy-security/universe Translation-en [238 kB]
+Get:31 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 c-n-f Metadata [23.2 kB]
+Get:32 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [79.6 kB]                                       
+Get:33 http://security.ubuntu.com/ubuntu jammy-security/multiverse Translation-en [13.6 kB]
+Get:34 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 c-n-f Metadata [544 B]
+Fetched 28.4 MB in 9s (3137 kB/s)                                                                                                 
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+280 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+## ns1 네트워크 네임스페이스를 생성
+
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ sudo ip netns add ns1
+
+## 네임스페이스 목록을 확인
+
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ ip netns list
+ns1
+
+## 네임스페이스 안에서 네트워크 인터페이스를 확인
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ sudo ip netns exec ns1 ip link
+1: lo: <LOOPBACK> mtu 65536 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ sudo ip netns exec ns1 ip link set lo up
+
+## 루프백 인터페이스 활성화
+
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ sudo ip netns exec ns1 ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+
+## 네임스페이스를 삭제
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ sudo ip netns del ns1
+jd@DESKTOP-3A89BL8:/mnt/c/codyssey1$ ip netns list
+
+## `pwd`로 현재 작업 디렉터리 확인
+
+```bash
+pwd
+
+```
+/mnt/c/codyssey1
+
+# 실습용 폴더 만들기
+
+```bash
+mkdir -p ~/codyssey1/docs
+
+```bash
+$ cd ~/codyssey1
+
+```bash
+$ pwd
+
+```
+/home/jd/codyssey1
+
+```bash
+ls
+
+```
+docs
+
+# 절대경로로 이동하기
+
+```bash
+cd /home/jd/codyssey1/docs
+
+```
+jd@DESKTOP-3A89BL8:~/codyssey1/docs$ 
+
+```bash
+pwd
+
+```
+/home/jd/codyssey1/docs
+
+# 상대경로로 이동하기
+
+```bash```bash
+touch practice.sh
+
+```bash
+ls -l practice.sh
+
+```
+-rw-r--r-- 1 jd jd 0 Nov  6 22:47 practice.sh
+
+# `chmod 755` 권한 변경 실습
+
+```bash
+chmod 755 practice.sh
+
+```
+-rwxr-xr-x 1 사용자이름 사용자이름 0 Nov  6 22:40 practice.sh
+
+# 변경된 권한 확인
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rwxr-xr-x 1 jd jd 0 Nov  6 22:47 practice.sh
+
+```bash
+
+stat -c "%a %n" practice.sh
+
+```
+
+755 practice.sh
+
+```bash
+
+chmod 644 practice.sh
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rw-r--r-- 1 jd jd 0 Nov  6 22:47 practice.sh
+
+```bash
+
+chmod 700 practice.sh
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rwx------ 1 jd jd 0 Nov  6 22:47 practice.sh
+
+```bash
+
+chmod 755 practice.sh
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rwxr-xr-x 1 jd jd 0 Nov  6 22:47 practice.sh
+
+
+cd ..
+
+```
+jd@DESKTOP-3A89BL8:~/codyssey1$ 
+
+```bash
+pwd
+
+```
+/home/jd/codyssey1
+
+```bash
+touch practice.sh
+
+```bash
+ls -l practice.sh
+
+```
+-rw-r--r-- 1 jd jd 0 Nov  6 22:47 practice.sh
+
+# `chmod 755` 권한 변경 실습
+
+```bash
+chmod 755 practice.sh
+
+```
+-rwxr-xr-x 1 사용자이름 사용자이름 0 Nov  6 22:40 practice.sh
+
+# 변경된 권한 확인
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rwxr-xr-x 1 jd jd 0 Nov  6 22:47 practice.sh
+
+```bash
+
+stat -c "%a %n" practice.sh
+
+```
+
+755 practice.sh
+
+```bash
+
+chmod 644 practice.sh
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rw-r--r-- 1 jd jd 0 Nov  6 22:47 practice.sh
+
+```bash
+
+chmod 700 practice.sh
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rwx------ 1 jd jd 0 Nov  6 22:47 practice.sh
+
+```bash
+
+chmod 755 practice.sh
+
+```bash
+
+ls -l practice.sh
+
+```
+
+-rwxr-xr-x 1 jd jd 0 Nov  6 22:47 practice.sh
+
+## `ss` 또는 `lsof` 명령 실습
+
+```bash
+ss -ltnp | grep :8000
+
+```
+LISTEN 0      5             0.0.0.0:8000      0.0.0.0:*    users:(("python3",pid=15486,fd=3))
+
+# lsof로도 확인하기
+
+```bash
+sudo lsof -i :8000
+
+```
+COMMAND   PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+python3 15486   jd    3u  IPv4 268192      0t0  TCP *:8000 (LISTEN)
+
+# 포트 충돌 재현
+
+```bash
+python3 -m http.server 8000
+
+```
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/usr/lib/python3.10/http/server.py", line 1307, in <module>
+    test(
+  File "/usr/lib/python3.10/http/server.py", line 1258, in test
+    with ServerClass(addr, HandlerClass) as httpd:
+  File "/usr/lib/python3.10/socketserver.py", line 452, in __init__
+    self.server_bind()
+  File "/usr/lib/python3.10/http/server.py", line 1301, in server_bind
+    return super().server_bind()
+  File "/usr/lib/python3.10/http/server.py", line 137, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/usr/lib/python3.10/socketserver.py", line 466, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+
+# 포트를 점유한 프로세스 종료
+
+```bash
+ kill 15486
+
+# 포트 해제 여부 확인
+
+```bash
+ss -ltnp | grep :8000
+
+sudo lsof -i :8000
+
 ### 트러블슈팅 2건 이상
 
 사례 1. Docker 이미지 빌드 실패
-실제 로그에 있는 오류
+실제 로그에 있었던 오류
+
 ① 문제 상황
 
 Dockerfile을 이용해 웹 서버 이미지를 생성하려고 docker build 명령어를 실행했지만 이미지 빌드에 실패했다.
@@ -995,7 +1324,7 @@ Docker 명령어를 실행한 현재 디렉터리에 Dockerfile이 존재하였�
 cd
 dir
 
-Dockerfile의 txt확장자를 삭제하여 실행가능하도록 수정한다.
+파일명 Dockerfile.txt를 ren Dockerfile.txt Dockerfile 실행
 docker build -t my-web:1.0 .
 
 ⑤ 해결 결과
@@ -1010,4 +1339,31 @@ nginx:alpine         785835ea65db       94.5MB         27.2MB    U
 nginx:latest         5ab5b0b01097        243MB         66.8MB    U 
 ubuntu:latest        6a06111c3b0a        163MB         45.9MB    U  
 
-### p <host_port>:<container_port>로 실행 후, 브라우저 접속 화면(주소창 포함)을 기술 문서에 첨부
+
+사례 2.  Docker 컨테이너 실행 명령어와 결과 기록 불일치
+
+① 문제 상황
+Docker 컨테이너 실행 명령어와 실행 결과를 README에 기록하는 과정에서 명령어가 실제 실행한 내용과 다르게 작성된 것을 확인했다.
+
+② 오류 메시지
+
+```bash
+docker run -d --name my-web -p 8080:80 my-.0
+```
+
+③ 원인 분석
+Docker 이미지 이름과 태그를 기록하는 과정에서 오타가 발생했다.
+
+실제로 사용한 이미지 이름은 `my-web:1.0`이지만, README에는 `my-.0`으로 잘못 기록되어 있었다.
+
+④ 해결 방법
+실제로 실행한 명령어를 확인하고 README의 명령어를 다음과 같이 수정했다.
+
+```bash
+docker run -d --name my-web -p 8080:80 my-web:1.0
+```
+
+⑤ 해결 결과
+실제 실행 명령어와 README에 기록된 명령어가 일치하도록 수정했다.
+
+이후 컨테이너 실행 결과와 포트 매핑 및 웹 접속 결과를 확인할 수 있도록 기록을 정리했다.
