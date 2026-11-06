@@ -576,13 +576,25 @@ docker build -t my-web:1.0 .
 ```
 
 ```text
-[+] Building 0.2s (1/1) FINISHED                                                                            docker:desktop-linux
- => [internal] load build definition from Dockerfile                                                                        0.1s
- => => transferring dockerfile: 2B                                                                                          0.0s 
-ERROR: failed to build: failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory
-
-What's next:
-    Debug this build failure with Gordon → docker ai "help me fix this build failure"
+[+] Building 0.8s (7/7) FINISHED                                                                            docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                        0.0s
+ => => transferring dockerfile: 214B                                                                                        0.0s 
+ => [internal] load metadata for docker.io/library/nginx:alpine                                                             0.1s 
+ => [internal] load .dockerignore                                                                                           0.0s
+ => => transferring context: 2B                                                                                             0.0s 
+ => [internal] load build context                                                                                           0.0s 
+ => => transferring context: 287B                                                                                           0.0s 
+ => CACHED [1/2] FROM docker.io/library/nginx:alpine@sha256:785835ea65db4bba6f021acc0f3be91b0fef76a53fe41f8588c6698d2aed06  0.0s 
+ => => resolve docker.io/library/nginx:alpine@sha256:785835ea65db4bba6f021acc0f3be91b0fef76a53fe41f8588c6698d2aed0606       0.0s 
+ => [2/2] COPY index.html /usr/share/nginx/html/index.html                                                                  0.1s
+ => exporting to image                                                                                                      0.3s 
+ => => exporting layers                                                                                                     0.1s 
+ => => exporting manifest sha256:4394bb7ed5740836abf6ad3378ae33f0fa095285c4a5ca027be2fc231d093c99                           0.0s
+ => => exporting config sha256:9438d5f5c5e318820ec217518c37527a8c981017bcc5d5d2b3af81c2d567cab7                             0.0s 
+ => => exporting attestation manifest sha256:d5da7817baa20e8885ab2dc0fad971b493f914d5ad490101cb70e144f133ecc2               0.0s 
+ => => exporting manifest list sha256:eb14682ce644d3e2a03ec22532d80781732f8b8d699e15ec9a15bc8ebcbf8db0                      0.0s 
+ => => naming to docker.io/library/my-web:1.0                                                                               0.0s 
+ => => unpacking to docker.io/library/my-web:1.0 
 ```
 
 ## 이미지 목록 확인
@@ -882,12 +894,12 @@ Docker volume persistence test
 
 
 ### Git 설정 및 GitHub 연동
-- [x] Git 사용자 이름 설정 — `git config --global user.name`
-- [x] Git 이메일 설정 — `git config --global user.email`
-- [x] 기본 브랜치 설정 — `git config --global init.defaultBranch main`
-- [x] Git 설정 확인 — `git config --list`
-- [x] VSCode에서 GitHub 로그인
-- [x] GitHub 원격 저장소 연동 및 push 확인
+- [o] Git 사용자 이름 설정 — `git config --global user.name`
+- [o] Git 이메일 설정 — `git config --global user.email`
+- [o] 기본 브랜치 설정 — `git config --global init.defaultBranch main`
+- [o] Git 설정 확인 — `git config --list`
+- [o] VSCode에서 GitHub 로그인
+- [o] GitHub 원격 저장소 연동 및 push 확인
 - 증거: [Git/GitHub 연동 로그]
 
 # Git/GitHub 연동 로그
@@ -960,25 +972,42 @@ To [https://github.com/jdspecialist/codyssey1.git](https://github.com/jdspeciali
  * [new branch]      main -> main
 ```
 
-## VS Code GitHub 로그인
-
-VS Code에서 GitHub 계정으로 로그인한 뒤, 브라우저 인증을 완료했습니다.
-
-
 ### 트러블슈팅 2건 이상
 
- 
+사례 1. Docker 이미지 빌드 실패
+실제 로그에 있는 오류
+① 문제 상황
+
+Dockerfile을 이용해 웹 서버 이미지를 생성하려고 docker build 명령어를 실행했지만 이미지 빌드에 실패했다.
+
+② 오류 메시지
+failed to read dockerfile:
+open Dockerfile: no such file or directory
+
+
+③ 원인 분석
+
+Docker 명령어를 실행한 현재 디렉터리에 Dockerfile이 존재하였으나 txt파일로 되어 있어 제대로 읽히지 않았다.
+
+④ 해결 방법
+
+먼저 현재 디렉터리와 파일 목록을 확인한다.
+cd
+dir
+
+Dockerfile의 txt확장자를 삭제하여 실행가능하도록 수정한다.
+docker build -t my-web:1.0 .
+
+⑤ 해결 결과
+
+빌드가 정상적으로 완료되었는지 확인한다.
+docker images
+
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+hello-world:latest   c567b231f656       25.9kB         9.49kB    U 
+my-web:1.0           1f991443b665       93.6MB         26.3MB    U 
+nginx:alpine         785835ea65db       94.5MB         27.2MB    U 
+nginx:latest         5ab5b0b01097        243MB         66.8MB    U 
+ubuntu:latest        6a06111c3b0a        163MB         45.9MB    U  
 
 ### p <host_port>:<container_port>로 실행 후, 브라우저 접속 화면(주소창 포함)을 기술 문서에 첨부
-
-### 바인드 마운트 반영 + 볼륨 영속성 증거
-
- - 바인드 마운트: 실행 명령 + 호스트 변경 전/후 비교
-
- -  Docker 볼륨: 생성/연결/검증 명령 + 컨테이너 삭제 전/후 비교
-
-### Git 설정 및 GitHub/VSCode 연동 증거
-
- -  Git 사용자 정보·기본 브랜치 설정 후, VSCode에서 GitHub 로그인 및 저장소 연동 완료
-
- - 민감한 개인 정보(ID/PW, 토큰 등)가 포함되지 않도록 주의한다.
