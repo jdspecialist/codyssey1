@@ -36,11 +36,21 @@ Git 사용자 정보와 기본 브랜치를 설정하고, VSCode에서 GitHub �
 
 # 터미널 조작 로그 (Windows CMD)
 
-## 2026-11-03
+## 현재 작업 디렉터리 확인 — `cd`
 
 ```cmd
 cd
 C:\Users\codessey1\terminal-practice
+
+## 숨김 파일 포함 목록 확인 — `dir /a`
+
+```cmd
+dir /a
+
+ C 드라이브의 볼륨에는 이름이 없습니다.
+ 볼륨 일련 번호: 50AD-60EB
+
+  C:\codyssey1 디렉터리
 
 2026-11-03  오전 06:48    <DIR>          .
 2026-11-02  오후 10:57    <DIR>          ..
@@ -54,17 +64,22 @@ C:\Users\codessey1\terminal-practice
                2개 파일              12,861 바이트
                7개 디렉터리   8,158,355,456 바이트 남음
 
+## 디렉터리 및 빈 파일 생성 — `mkdir`, `type nul >`
+
 mkdir docs
 type nul > docs\terminal-log.md
+
+## 파일 복사, 이름 변경/이동, 삭제 — `copy`, `ren`, `move`, `del`
 
 copy docs\terminal-log.md docs\terminal-log-copy.md
 ren docs\terminal-log-copy.md terminal-log-renamed.md
 move docs\terminal-log-renamed.md docs\terminal-log-moved.md
 del docs\terminal-log-moved.md
 
+## 파일 내용 확인 — `type`
+
 type docs\terminal-log.md
 ```
-
 ### 파일 및 디렉터리 권한 (Windows CMD)
 - [o] 파일 권한 확인 — `icacls practice.txt`
 - [o] 파일 권한 변경 및 변경 전/후 비교 — `icacls practice.txt /grant "%USERNAME%":R`
@@ -82,7 +97,12 @@ icacls practice.txt
 ```
 
 ```text
-practice.txt ... 사용자이름:(I)(F)
+practice.txt BUILTIN\Administrators:(I)(F)
+             NT AUTHORITY\SYSTEM:(I)(F)
+             BUILTIN\Users:(I)(RX)
+             NT AUTHORITY\Authenticated Users:(I)(M)
+
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
 ```
 
 ### 변경 명령
@@ -95,10 +115,11 @@ icacls practice.txt /grant "%USERNAME%":R
 
 ```cmd
 icacls practice.txt
-```
+
 
 ```text
 practice.txt ... 사용자이름:(R)
+
 ```
 
 ## 디렉터리 권한
@@ -109,17 +130,35 @@ practice.txt ... 사용자이름:(R)
 icacls practice-dir
 ```
 
+practice-dir BUILTIN\Administrators:(I)(OI)(CI)(F)
+             NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+             BUILTIN\Users:(I)(OI)(CI)(RX)
+             NT AUTHORITY\Authenticated Users:(I)(M)
+             NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+
 ### 변경 명령
 
 ```cmd
 icacls practice-dir /grant "%USERNAME%":RX
 ```
+처리된 파일: practice-dir
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
 
 ### 변경 후
 
 ```cmd
 icacls practice-dir
 ```
+
+practice-dir DESKTOP-3A89BL8\jd:(RX)
+             BUILTIN\Administrators:(I)(OI)(CI)(F)
+             NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+             BUILTIN\Users:(I)(OI)(CI)(RX)
+             NT AUTHORITY\Authenticated Users:(I)(M)
+             NT AUTHORITY\Authenticated Users:(I)(OI)(CI)(IO)(M)
+
+1 파일을 처리했으며 0 파일은 처리하지 못했습니다.
+
 
 ### Docker 설치 및 점검
 - [o] Docker 버전 확인 — `docker --version`
